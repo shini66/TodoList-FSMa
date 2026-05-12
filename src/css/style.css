@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+.complete span.text{
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-8px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.task-intro {
+    animation: slideIn 0.3s ease-out;
+}

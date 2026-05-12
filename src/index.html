@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List FSM</title>
+
+    <link rel="stylesheet" href="/dist/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/src/js/helper.js"></script>
+
+</head>
+<body class="bg-[#E1F5EE] min-h-screen text-stone-800">
+
+    <header class="bg-[#1D9E75] px-6 py-8">
+        <div class="max-w-lg mx-auto">
+            <h1 class="text-white text-3xl font-light">Mis tareas</h1>
+            <p class="text-green-100 text-xs mt-1" id="resume">Cargando...</p>
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto px-6 py-8">
+        <div class="flex gap-2 mb-5">
+            <input onkeydown="if(event.key === 'Enter') addTask()" type="text" name="task" id="task" class="flex-1 text-sm border border-stone-300 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#1D9E75] placeholder-stone-400" placeholder="Describe la tarea...">
+            <button onclick="addTask()" class="bg-[#1D9E75] hover:bg-[#0F6E56] text-white text-sm px-4 py-2.5 rounded-lg transition-colors">+ Agregar</button>
+        </div>
+
+        <div class="flex gap-2 mb-4">
+            <button onclick="setFiltro('All')"       id="f-todas"       class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Todas</button>
+            <button onclick="setFiltro('Pending')"  id="f-pendientes"  class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Pendientes</button>
+            <button onclick="setFiltro('Completed')" id="f-completadas" class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Completadas</button>
+        </div>
+
+        <ul id="taskList" class="flex flex-col gap-2"></ul>
+
+        <div id="emptyState" class="hidden text-center py-12">
+            <p class="text-stone-300 text-xl font-light">No hay tareas aquí</p>
+        </div>
+    </main>
+
+    <script src="./js/app.js"></script>
+</body>
+</html>

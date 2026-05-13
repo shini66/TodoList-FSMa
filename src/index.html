@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <script src="/src/js/helper.js"></script>
 
 </head>
+
 <body class="bg-[#E1F5EE] min-h-screen text-stone-800">
 
     <header class="bg-[#1D9E75] px-6 py-8">
@@ -21,14 +23,21 @@
 
     <main class="max-w-lg mx-auto px-6 py-8">
         <div class="flex gap-2 mb-5">
-            <input onkeydown="if(event.key === 'Enter') addTask()" type="text" name="task" id="task" class="flex-1 text-sm border border-stone-300 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#1D9E75] placeholder-stone-400" placeholder="Describe la tarea...">
-            <button onclick="addTask()" class="bg-[#1D9E75] hover:bg-[#0F6E56] text-white text-sm px-4 py-2.5 rounded-lg transition-colors">+ Agregar</button>
+            <input onkeydown="if(event.key === 'Enter') addTask()" type="text" name="task" id="task"
+                class="flex-1 text-sm border border-stone-300 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#1D9E75] placeholder-stone-400"
+                placeholder="Describe la tarea...">
+            <button onclick="addTask()"
+                class="bg-[#1D9E75] hover:bg-[#0F6E56] text-white text-sm px-4 py-2.5 rounded-lg transition-colors">+
+                Agregar</button>
         </div>
 
         <div class="flex gap-2 mb-4">
-            <button onclick="setFiltro('All')"       id="f-todas"       class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Todas</button>
-            <button onclick="setFiltro('Pending')"  id="f-pendientes"  class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Pendientes</button>
-            <button onclick="setFiltro('Completed')" id="f-completadas" class="filtro-btn text-xs px-3 py-1.5 rounded-full border transition-all">Completadas</button>
+            <button onclick="setFilter('all')" id="f-all"
+                class="filter-btn text-xs px-3 py-1.5 rounded-full border transition-all">Todas</button>
+            <button onclick="setFilter('pending')" id="f-pending"
+                class="filter-btn text-xs px-3 py-1.5 rounded-full border transition-all">Pendientes</button>
+            <button onclick="setFilter('completed')" id="f-completed"
+                class="filter-btn text-xs px-3 py-1.5 rounded-full border transition-all">Completadas</button>
         </div>
 
         <ul id="taskList" class="flex flex-col gap-2"></ul>
@@ -40,4 +49,5 @@
 
     <script src="./js/app.js"></script>
 </body>
+
 </html>

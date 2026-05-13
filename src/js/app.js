@@ -6,6 +6,7 @@ const taskList = document.getElementById('taskList');
 const emptyState = document.getElementById('emptyState');
 const resume = document.getElementById('resume');
 
+setFilter(currentFilter);
 renderTasks();
 
 function addTask() {
@@ -64,4 +65,38 @@ function updateResume() {
     const completedCount = tasks.filter(task => task.completed).length;
     const pendingCount = tasks.length - completedCount;
     resume.textContent = `Tareas: ${tasks.length} | Completadas: ${completedCount} | Pendientes: ${pendingCount}`;
+}
+
+function toggleTask(id) {
+    tasks = tasks.map(task => task.id === id ? {...task, completed: !task.completed} : task);
+    renderTasks();
+    toastAlert('Tarea actualizada correctamente', 'success');
+}
+
+function deleteTask(id) {
+    alertConfirm(
+        '¿Estás seguro?',
+        'Esta acción no se puede deshacer',
+        'Sí, eliminar',
+        'No, cancelar',
+        () => {
+            tasks = tasks.filter(task => task.id !== id);
+            renderTasks();
+            toastAlert('Tarea eliminada correctamente', 'success');
+        }
+    );
+}
+
+function setFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList = 'filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 text-stone-400 transition-all';
+    });
+    const btn = document.getElementById(`f-${filter}`);
+    if (btn) {
+        btn.classList = `filter-btn text-xs px-3 py-1.5 rounded-full border bg-[#1D9E75] text-white border-[#1D9E75] transition-all`;
+    } else {
+        console.warn(`Botón de filtro no encontrado: f-${filter}`);
+    }
+    renderTasks();
 }

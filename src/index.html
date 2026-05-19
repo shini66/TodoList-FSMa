@@ -38,6 +38,14 @@
                 class="filter-btn text-xs px-3 py-1.5 rounded-full border transition-all">Pendientes</button>
             <button onclick="setFilter('completed')" id="f-completed"
                 class="filter-btn text-xs px-3 py-1.5 rounded-full border transition-all">Completadas</button>
+
+            <div class="ml-auto flex gap-2">
+                <button onclick="exportTasks()"
+                    class="text-xs px-3 py-1.5 rounded-full border border-stone-300 text-stone-500 hover:bg-stone-100 transition-all">⬇ Exportar</button>
+                <button onclick="document.getElementById('importInput').click()"
+                    class="text-xs px-3 py-1.5 rounded-full border border-stone-300 text-stone-500 hover:bg-stone-100 transition-all">⬆ Importar</button>
+                <input type="file" id="importInput" accept=".json" class="hidden" onchange="importTasks(event)">
+            </div>
         </div>
 
         <ul id="taskList" class="flex flex-col gap-2"></ul>

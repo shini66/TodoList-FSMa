@@ -238,3 +238,69 @@ function saveTasks() {
 function loadTasks() {
   tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 }
+
+/* =========================
+   📤 EXPORTAR TAREAS
+========================= */
+function exportTasks() {
+  if (tasks.length === 0) {
+    toastAlert("No hay tareas para exportar", "error");
+    return;
+  }
+
+  const json = JSON.stringify(tasks, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tareas-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+  toastAlert("Tareas exportadas correctamente", "success");
+}
+
+/* =========================
+   📥 IMPORTAR TAREAS
+========================= */
+function importTasks(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (!Array.isArray(imported)) throw new Error("Formato inválido");
+
+      const isValid = imported.every(
+        (t) => typeof t.id !== "undefined" && typeof t.text === "string" && typeof t.completed === "boolean"
+      );
+
+      if (!isValid) throw new Error("Estructura de tareas inválida");
+
+      alertConfirm(
+        "¿Restaurar tareas?",
+        "Esto reemplazará las tareas actuales con las del archivo",
+        "Sí, restaurar",
+        "Cancelar",
+        () => {
+          tasks = imported;
+          saveTasks();
+          renderTasks();
+          toastAlert("Tareas restauradas correctamente", "success");
+        }
+      );
+    } catch {
+      toastAlert("El archivo no es válido", "error");
+    } finally {
+      // reset para permitir reimportar el mismo archivo
+      event.target.value = "";
+    }
+  };
+
+  reader.readAsText(file);
+}

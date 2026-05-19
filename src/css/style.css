@@ -5,17 +5,47 @@
     opacity: 0.5;
 }
 
+/* Entrada sutil tipo Notion/Trello */
 @keyframes slideIn {
     from {
-        transform: translateX(-8px);
+        transform: translateX(-8px) translateY(4px) scale(0.995);
         opacity: 0;
     }
     to {
-        transform: translateX(0);
+        transform: translateX(0) translateY(0) scale(1);
         opacity: 1;
     }
 }
 
 .task-intro {
-    animation: slideIn 0.3s ease-out;
+    animation: slideIn 240ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* Elevación y suavizado en hover */
+.task-card {
+    transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease, opacity 180ms ease;
+    will-change: transform, opacity;
+}
+.task-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(15,46,51,0.06);
+}
+
+/* Animación al eliminar */
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(8px) scale(0.995); opacity: 0; }
+}
+.removing {
+    animation: slideOut 220ms ease-in forwards;
+}
+
+/* Efecto pequeño al completar */
+@keyframes pulseSmall {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+.pulse {
+    animation: pulseSmall 220ms ease-out;
 }

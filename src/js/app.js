@@ -1,18 +1,36 @@
 let tasks = [];
 let currentFilter = 'all';
 
+/* =========================
+   🔵 ELEMENTOS DEL DOM
+========================= */
 const inputTask = document.getElementById('task');
 const taskList = document.getElementById('taskList');
 const emptyState = document.getElementById('emptyState');
 const resume = document.getElementById('resume');
 
+/* =========================
+   🟢 INICIALIZACIÓN (NEW)
+   - carga de storage
+   - render inicial
+   - eventos globales
+========================= */
+loadTasks();
 setFilter(currentFilter);
 renderTasks();
 
+/* Enter para agregar tarea (NEW UX) */
+inputTask.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+
+/* =========================
+   🟡 ADD TASK
+========================= */
 function addTask() {
     const text = inputTask.value.trim();
 
-    if(!text){
+    if (!text) {
         toastAlert('El campo de tarea debe ser completado', 'error');
         return;
     }
@@ -22,57 +40,131 @@ function addTask() {
         text,
         completed: false
     };
+
     tasks.push(newTask);
     inputTask.value = '';
+
+    saveTasks(); // NEW: persistencia
     renderTasks();
+
     toastAlert('Tarea agregada correctamente', 'success');
 }
 
+/* =========================
+   🟣 FILTROS
+========================= */
 function getTasksByFilter() {
-    if(currentFilter === 'pending') return tasks.filter(task => !task.completed);
-    if(currentFilter === 'completed') return tasks.filter(task => task.completed);
+    if (currentFilter === 'pending') return tasks.filter(t => !t.completed);
+    if (currentFilter === 'completed') return tasks.filter(t => t.completed);
     return tasks;
 }
 
+/* =========================
+   🔴 RENDER OPTIMIZADO (NEW)
+   - fragment para performance
+   - DOM API en vez de innerHTML inseguro
+   - event delegation
+========================= */
 function renderTasks() {
     taskList.innerHTML = '';
+
     const filteredTasks = getTasksByFilter();
 
-    filteredTasks.length === 0 ? emptyState.classList.remove('hidden') : emptyState.classList.add('hidden');
+    /* Empty state */
+    if (filteredTasks.length === 0) {
+        emptyState.classList.remove('hidden');
+    } else {
+        emptyState.classList.add('hidden');
+    }
+
+    const fragment = document.createDocumentFragment();
 
     filteredTasks.forEach(task => {
         const li = document.createElement('li');
-        li.textContent = task.text;
         li.className = [
             'tarea-enter flex items-center gap-3 bg-white border border-stone-100',
             'rounded-xl px-4 py-3 transition-all',
-            task.completed ? 'completada opacity-70' : '',
+            task.completed ? 'completada opacity-70' : ''
         ].join(' ');
 
-        li.innerHTML = `<span>${task.text}</span>
-            <div class="ml-auto flex items-center gap-2">
-                <button onclick="toggleTask(${task.id})" class="text-sm text-brand-400">${task.completed ? 'Reabrir' : 'Completar'}</button>
-                <button onclick="deleteTask(${task.id})" class="text-sm text-red-500">Eliminar</button>
-            </div>`;
+        /* texto seguro */
+        const span = document.createElement('span');
+        span.textContent = task.text;
 
-        taskList.appendChild(li);
+        const actions = document.createElement('div');
+        actions.className = 'ml-auto flex items-center gap-2';
+
+        /* botón toggle */
+        const toggleBtn = document.createElement('button');
+        toggleBtn.textContent = task.completed ? 'Reabrir' : 'Completar';
+        toggleBtn.className = 'text-sm text-brand-400';
+        toggleBtn.dataset.action = 'toggle';
+        toggleBtn.dataset.id = task.id;
+
+        /* botón delete */
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Eliminar';
+        deleteBtn.className = 'text-sm text-red-500';
+        deleteBtn.dataset.action = 'delete';
+        deleteBtn.dataset.id = task.id;
+
+        actions.appendChild(toggleBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(span);
+        li.appendChild(actions);
+
+        fragment.appendChild(li);
     });
+
+    taskList.appendChild(fragment);
 
     updateResume();
 }
 
+/* =========================
+   🟤 EVENT DELEGATION (NEW)
+   - reemplaza onclick inline
+========================= */
+taskList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const id = Number(btn.dataset.id);
+    const action = btn.dataset.action;
+
+    if (action === 'toggle') toggleTask(id);
+    if (action === 'delete') deleteTask(id);
+});
+
+/* =========================
+   🔵 RESUMEN
+========================= */
 function updateResume() {
-    const completedCount = tasks.filter(task => task.completed).length;
+    const completedCount = tasks.filter(t => t.completed).length;
     const pendingCount = tasks.length - completedCount;
-    resume.textContent = `Tareas: ${tasks.length} | Completadas: ${completedCount} | Pendientes: ${pendingCount}`;
+
+    resume.textContent =
+        `Tareas: ${tasks.length} | Completadas: ${completedCount} | Pendientes: ${pendingCount}`;
 }
 
+/* =========================
+   🟠 TOGGLE TASK
+========================= */
 function toggleTask(id) {
-    tasks = tasks.map(task => task.id === id ? {...task, completed: !task.completed} : task);
+    tasks = tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+    );
+
+    saveTasks(); // NEW
     renderTasks();
+
     toastAlert('Tarea actualizada correctamente', 'success');
 }
 
+/* =========================
+   🔴 DELETE TASK
+========================= */
 function deleteTask(id) {
     alertConfirm(
         '¿Estás seguro?',
@@ -81,22 +173,44 @@ function deleteTask(id) {
         'No, cancelar',
         () => {
             tasks = tasks.filter(task => task.id !== id);
+
+            saveTasks(); // NEW
             renderTasks();
+
             toastAlert('Tarea eliminada correctamente', 'success');
         }
     );
 }
 
+/* =========================
+   🟢 FILTROS UI
+========================= */
 function setFilter(filter) {
     currentFilter = filter;
+
     document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList = 'filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 text-stone-400 transition-all';
+        btn.className =
+            'filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 text-stone-400 transition-all';
     });
+
     const btn = document.getElementById(`f-${filter}`);
+
     if (btn) {
-        btn.classList = `filter-btn text-xs px-3 py-1.5 rounded-full border bg-[#1D9E75] text-white border-[#1D9E75] transition-all`;
-    } else {
-        console.warn(`Botón de filtro no encontrado: f-${filter}`);
+        btn.className =
+            'filter-btn text-xs px-3 py-1.5 rounded-full border bg-[#1D9E75] text-white border-[#1D9E75] transition-all';
     }
+
     renderTasks();
+}
+
+/* =========================
+   💾 LOCALSTORAGE (NEW)
+   - persistencia de datos
+========================= */
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function loadTasks() {
+    tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 }
